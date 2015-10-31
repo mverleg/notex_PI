@@ -1,7 +1,7 @@
 
 from django import forms
 from django.core.validators import RegexValidator
-from pindex.functions import version_str2intrest, version_intrest2str
+from indx.functions import version_str2intrest, version_intrest2str
 
 
 # class PackageRequirementForm(forms.ModelForm):

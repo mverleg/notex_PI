@@ -1,7 +1,7 @@
 
 from django.contrib import admin
-from pindex.forms import PackageVersionForm
-from pindex.models import PackageSeries, PackageVersion
+from indx.forms import PackageVersionForm
+from indx.models import PackageSeries, PackageVersion
 
 
 class PackageVersionInline(admin.TabularInline):

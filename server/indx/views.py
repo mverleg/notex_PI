@@ -7,8 +7,8 @@ from django.shortcuts import redirect
 from os.path import exists
 from os.path import join
 from base.json_response import JSONResponse
-from pindex.functions import version_str2intrest, VersionTooHigh
-from pindex.models import PackageSeries, PackageVersion
+from indx.functions import version_str2intrest, VersionTooHigh
+from indx.models import PackageSeries, PackageVersion
 
 
 def package_list(request):
@@ -59,10 +59,26 @@ def version_info(request, name, v):
 		return HttpResponse('package "{0:s}" version "{1:s}" appears to be damaged or missing'.format(name, v), status=500)
 	with open(join(version.path, 'config.json'), 'r') as fh:
 		info = load(fp = fh, object_pairs_hook = OrderedDict)
+	INDEX_URL = 'http://localhost.markv.nl/index'
+	CDN_URL = 'http://localhost.markv.nl/cdn'
 	info['versions'] = versions
 	info['download'] = ''
-	info['cdn_prefix'] = ''
+	info['cdn_prefix'] = CDN_URL
 	return JSONResponse(request, info)
 
+
+def version_download(request, name, v):
+	try:
+		package = PackageSeries.objects.get(name=name)
+	except PackageSeries.DoesNotExist:
+		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
+	try:
+		vnr, rest = version_str2intrest(v)
+		version = PackageVersion.objects.get(package=package, version=vnr, rest=rest)
+	except PackageVersion.DoesNotExist:
+		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)
+	except VersionTooHigh:
+		return HttpResponse('version "{1:s}" for package "{0:s}" is too high'.format(name, v), status=400)
+	version.path
 
 

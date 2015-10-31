@@ -10,7 +10,8 @@ PACKAGE_DIR = join(BASE_DIR, 'packages')
 
 PACKAGE_NAME_PATTERN = r'[a-zA-Z][a-zA-Z0-9_.]*'
 
-INDEX_URL = 'http://localhost.markv.nl/index'
+VERSION_REST_PATTERN = r'[^.][a-zA-Z0-9_\-.]+'
+
 CDN_URL = 'http://localhost.markv.nl/cdn'
 
 FILENAME_PATTERN = r'[a-zA-Z0-9_\-.]{1,32}'
@@ -32,10 +33,7 @@ INSTALLED_APPS = (
 	'django.contrib.staticfiles',
 	'base',
 	'accounts',
-	'pindex',
 	'indx',
-	'statcdn',
-	'upld',
 )
 
 MIDDLEWARE_CLASSES = (
