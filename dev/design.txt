@@ -1,0 +1,8 @@
+NoTeX Package Index
+
+
+- I can add some automatic license detection and then allow users to sort by common restrictions (viral, commercial)
+- Make sure there's no circularity (perhaps through a generous max depth
+-
+-
+-
