@@ -10,6 +10,9 @@ PACKAGE_DIR = join(BASE_DIR, 'packages')
 
 PACKAGE_NAME_PATTERN = r'[a-zA-Z][a-zA-Z0-9_.]*'
 
+INDEX_URL = 'http://localhost.markv.nl/index'
+CDN_URL = 'http://localhost.markv.nl/cdn'
+
 FILENAME_PATTERN = r'[a-zA-Z0-9_\-.]{1,32}'
 FILENAME_MESSAGE = 'File and directory names may have a length up to 32 ' + \
 	'selected from alphanumeric characters, periods, dashes and underscores.'  # the 32 is the chosen db limit
@@ -30,7 +33,7 @@ INSTALLED_APPS = (
 	'base',
 	'accounts',
 	'pindex',
-	'pserve',
+	'indx',
 	'statcdn',
 	'upld',
 )

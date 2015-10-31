@@ -1,5 +1,9 @@
 
 
+class VersionTooHigh(Exception):
+	pass
+
+
 def version_str2intrest(txt, mx = 10000):
 	if txt.count('.') == 0:
 		major, minor, rest = '0' + txt, 0, ''
@@ -8,7 +12,8 @@ def version_str2intrest(txt, mx = 10000):
 	else:
 		major, minor, rest = txt.split('.', maxsplit = 2)
 	major, minor = int(major), int(minor)
-	assert major < mx - 1 and minor < mx - 1
+	if not (major < mx - 1 and minor < mx - 1):
+		raise VersionTooHigh('version too high')
 	return mx * major + minor, rest
 
 
