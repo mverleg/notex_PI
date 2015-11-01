@@ -6,7 +6,8 @@ from django.core.management import BaseCommand
 from os.path import join
 from re import compile
 from django.db.transaction import atomic
-from indx.functions import version_str2intrest
+from indx.upload import upload_postproc
+from indx.version_convs import version_str2intrest
 from indx.models import PackageVersion, PackageSeries
 
 
@@ -30,6 +31,7 @@ class Command(BaseCommand):
 			pv = PackageVersion(package=package, version=vnr, rest=rest, listed=False)
 			pv.save()
 			made.append(pv)
+		return made
 
 	@atomic
 	def delete_instances(self, to_delete, obj_map):
@@ -81,7 +83,10 @@ class Command(BaseCommand):
 		deletes = insts - dirs
 		package_objs = {obj.name: obj for obj in PackageSeries.objects.all()}
 		print('creating {0:d} instances'.format(len(creates)))
-		self.create_instances(creates, package_objs)
+		versions = self.create_instances(creates, package_objs)
+		print('preparing the instances (queue)')
+		for version in versions:
+			upload_postproc(version)
 		print('cleaning up {0:d} instances'.format(len(deletes)))
 		self.delete_instances(deletes, package_objs)
 		print('done!')

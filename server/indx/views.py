@@ -1,13 +1,12 @@
 
 from collections import OrderedDict
 from json import load
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from os.path import exists
-from os.path import join
+from os.path import exists, join, getsize
 from base.json_response import JSONResponse
-from indx.functions import version_str2intrest, VersionTooHigh
+from indx.version_convs import version_str2intrest, VersionTooHigh
 from indx.models import PackageSeries, PackageVersion
 
 
@@ -19,14 +18,6 @@ def package_list(request):
 		if versions:
 			index[package.name] = versions
 	return JSONResponse(request, index)
-
-
-def package_redirect(request, name):
-	try:
-		package = PackageSeries.objects.get(name=name)
-	except PackageSeries.DoesNotExist:
-		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
-	return redirect(reverse('package_info', kwargs={'name': package.name}))
 
 
 def package_info(request, name):
@@ -54,16 +45,17 @@ def version_info(request, name, v):
 	except VersionTooHigh:
 		return HttpResponse('version "{1:s}" for package "{0:s}" is too high'.format(name, v), status=400)
 	versions = [pv.version_display for pv in package.versions.filter(listed=True)]
-	# download url
 	if not exists(join(version.path, 'config.json')):
 		return HttpResponse('package "{0:s}" version "{1:s}" appears to be damaged or missing'.format(name, v), status=500)
 	with open(join(version.path, 'config.json'), 'r') as fh:
 		info = load(fp = fh, object_pairs_hook = OrderedDict)
-	INDEX_URL = 'http://localhost.markv.nl/index'
-	CDN_URL = 'http://localhost.markv.nl/cdn'
+	download_url = reverse('version_download', kwargs={'name': package.name, 'v': version.version_display})
+	ready = version.is_ready
+	info['is_ready'] = ready
+	if ready:
+		info['download_url'] = join(settings.SITE_URL, download_url[1:])
+		info['cdn_prefix'] = settings.CDN_URL
 	info['versions'] = versions
-	info['download'] = ''
-	info['cdn_prefix'] = CDN_URL
 	return JSONResponse(request, info)
 
 
@@ -79,6 +71,22 @@ def version_download(request, name, v):
 		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)
 	except VersionTooHigh:
 		return HttpResponse('version "{1:s}" for package "{0:s}" is too high'.format(name, v), status=400)
-	version.path
+	if not version.is_ready:
+		return HttpResponse('package version is not ready, please wait', status=400)
+	if settings.DEBUG:
+		"""
+			Serve the file through Django; only for development!
+		"""
+		response = HttpResponse(open(version.zip_path, 'br').read())
+	else:
+		"""
+			Let Apache do the work by giving it a X-Sendfile header as authorization.
+		"""
+		response = HttpResponse('')
+		response['X-Sendfile'] = version.zip_path
+	response['Content-type'] = 'application/zip'
+	response['Content-Disposition'] = 'attachment; filename="{0:s}"'.format(version.version_display)
+	response['Content-Length'] = getsize(version.zip_path)
+	return response
 
 

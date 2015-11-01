@@ -3,8 +3,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.db import models
-from os.path import join
-from indx.functions import version_intrest2str
+from os.path import join, exists
+from indx.version_convs import version_intrest2str
 
 
 class PackageSeries(models.Model):
@@ -40,7 +40,7 @@ class PackageVersion(models.Model):
 	class Meta:
 		verbose_name = 'Version'
 		unique_together = ('package', 'version', 'rest')
-		ordering = ('-when',)
+		ordering = ('-version',)
 
 	def __str__(self):
 		return '{0:s}=={1:s}'.format(self.package.name, self.version_display)
@@ -52,6 +52,14 @@ class PackageVersion(models.Model):
 	@property
 	def path(self):
 		return join(settings.PACKAGE_DIR, self.package.name, 'v{0:s}'.format(self.version_display))
+
+	@property
+	def zip_path(self):
+		return join(settings.PACKAGE_ZIP_DIR, self.package.name, '{0:s}.zip'.format(self.version_display))
+
+	@property
+	def is_ready(self):
+		return exists(self.zip_path)
 
 	def get_absolute_path(self):
 		return reverse('version_info', kwargs={'name': self.name, 'v': self.version_display})

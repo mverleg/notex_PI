@@ -3,7 +3,6 @@ from django.conf import settings
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from indx.views import package_list, package_redirect, package_info, version_info, version_download
 
 
 urlpatterns = [

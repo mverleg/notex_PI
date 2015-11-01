@@ -6,13 +6,15 @@ BASE_DIR = dirname(dirname(abspath(__file__)))
 
 AUTH_USER_MODEL = 'accounts.IndexUser'
 
+PACKAGE_ZIP_DIR = join(BASE_DIR, 'package_zips')
 PACKAGE_DIR = join(BASE_DIR, 'packages')
 
 PACKAGE_NAME_PATTERN = r'[a-zA-Z][a-zA-Z0-9_.]*'
 
 VERSION_REST_PATTERN = r'[^.][a-zA-Z0-9_\-.]+'
 
-CDN_URL = 'http://localhost.markv.nl/cdn'
+SITE_URL = 'http://localhost.markv.nl:8000/'
+CDN_URL = 'http://localhost.markv.nl:8000/cdn'
 
 FILENAME_PATTERN = r'[a-zA-Z0-9_\-.]{1,32}'
 FILENAME_MESSAGE = 'File and directory names may have a length up to 32 ' + \
@@ -34,6 +36,7 @@ INSTALLED_APPS = (
 	'base',
 	'accounts',
 	'indx',
+	'django_q',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -73,6 +76,10 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.sqlite3',
 		'NAME': join(BASE_DIR, 'data', 'db.sqlite3'),
+	},
+	'queue': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': join(BASE_DIR, 'data', 'queue.sqlite3'),
 	}
 }
 
@@ -87,3 +94,13 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+Q_CLUSTER = {
+	'name': 'package_index',
+	'workers': 3,
+	'compress': True,
+	'label': 'Django Q',
+	'orm': 'queue',
+}
+
+
