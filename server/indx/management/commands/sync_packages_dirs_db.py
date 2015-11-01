@@ -1,14 +1,14 @@
 
 from os import walk
-from json import load
+from commentjson import load
 from django.conf import settings
 from django.core.management import BaseCommand
 from os.path import join
 from re import compile
 from django.db.transaction import atomic
 from indx.upload import upload_postproc
-from indx.version_convs import version_str2intrest
 from indx.models import PackageVersion, PackageSeries
+from package_versions import str2intrest
 
 
 class Command(BaseCommand):
@@ -27,7 +27,7 @@ class Command(BaseCommand):
 				obj_map[conf['name']] = package
 			else:
 				package = obj_map[conf['name']]
-			vnr, rest = version_str2intrest(conf['version'])
+			vnr, rest = str2intrest(conf['version'])
 			pv = PackageVersion(package=package, version=vnr, rest=rest, listed=False)
 			pv.save()
 			made.append(pv)

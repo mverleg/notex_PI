@@ -1,6 +1,6 @@
 
 from django.core.management import BaseCommand
-from indx.upload import upload_postproc, test_queue
+from indx.upload import upload_postproc
 from indx.models import PackageVersion
 
 
