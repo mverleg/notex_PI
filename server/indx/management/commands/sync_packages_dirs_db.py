@@ -1,6 +1,7 @@
 
 from os import walk
-from commentjson import load
+# from commentjson import load  #todo
+from json import load
 from django.conf import settings
 from django.core.management import BaseCommand
 from os.path import join
@@ -8,7 +9,7 @@ from re import compile
 from django.db.transaction import atomic
 from indx.upload import upload_postproc
 from indx.models import PackageVersion, PackageSeries
-from package_versions import str2intrest
+from package_versions import str2nrrest
 
 
 class Command(BaseCommand):
@@ -19,7 +20,7 @@ class Command(BaseCommand):
 		for create in to_create:
 			with open(join(settings.PACKAGE_DIR, create, 'config.json')) as fh:
 				conf = load(fp = fh)
-			checkname = '{0:s}/v{1:s}'.format(conf['name'], conf['version'])
+			checkname = '{0:s}/{1:s}'.format(conf['name'], conf['version'])
 			assert create == checkname, 'filename and config do not match! path: {0:s} config: {1:s}'.format(create, checkname)
 			if not conf['name'] in obj_map:
 				package = PackageSeries(name=conf['name'], owner=None, license_name=conf.get('license', '?'), readme_name=conf.get('readme', ''), listed=False)
@@ -27,7 +28,7 @@ class Command(BaseCommand):
 				obj_map[conf['name']] = package
 			else:
 				package = obj_map[conf['name']]
-			vnr, rest = str2intrest(conf['version'])
+			vnr, rest = str2nrrest(conf['version'])
 			pv = PackageVersion(package=package, version=vnr, rest=rest, listed=False)
 			pv.save()
 			made.append(pv)
@@ -45,7 +46,7 @@ class Command(BaseCommand):
 		pattern = '^{0:s}$'.format(join(
 			settings.PACKAGE_DIR,
 			'({0:s})'.format(settings.PACKAGE_NAME_PATTERN),
-			'(v\d+\.\d+(?:\.{0:s})?)'.format(settings.VERSION_REST_PATTERN),
+			'(\d+\.\d+(?:\.{0:s})?)'.format(settings.VERSION_REST_PATTERN),
 			'config.json',
 		))
 		dirs = []
@@ -66,7 +67,7 @@ class Command(BaseCommand):
 		insts = []
 		pvs = PackageVersion.objects.prefetch_related('package')
 		for pv in pvs:
-			nm = '{0:s}/v{1:s}'.format(pv.package.name, pv.version_display)
+			nm = '{0:s}/{1:s}'.format(pv.package.name, pv.version_display)
 			insts.append(nm)
 		insts = set(insts)
 		print('found {0:d} package version instances'.format(len(insts)))

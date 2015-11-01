@@ -2,7 +2,7 @@
 from django import forms
 from django.conf import settings
 from django.core.validators import RegexValidator
-from package_versions import intrest2str, str2intrest
+from package_versions import nrrest2str, str2nrrest
 
 
 class PackageVersionForm(forms.ModelForm):
@@ -18,12 +18,12 @@ class PackageVersionForm(forms.ModelForm):
 		super(PackageVersionForm, self).__init__(*args, instance = instance, **kwargs)
 		self.fields['version_str'].widget.attrs['placeholder'] = 'enter version'
 		if instance:
-			self.fields['version_str'].initial = intrest2str(instance.version, instance.rest)
+			self.fields['version_str'].initial = nrrest2str(instance.version, instance.rest)
 
 	def clean(self):
 		assert self.instance
 		cleaned_data = super(PackageVersionForm, self).clean()
 		if 'version_str' in cleaned_data:
-			self.instance.version, self.instance.rest = str2intrest(cleaned_data['version_str'].lstrip('v'))
+			self.instance.version, self.instance.rest = str2nrrest(cleaned_data['version_str'])
 
 

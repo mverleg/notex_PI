@@ -8,7 +8,7 @@ import accounts.urls
 
 urlpatterns = [
 	url(r'^$', lambda request: HttpResponse('homepage')),
-	url(r'^~admin/', include(admin.site.urls)),
+	url(r'^@dmin/', include(admin.site.urls)),
 	url(r'^~', include(accounts.urls)),
 	url(r'^', include(indx.urls)),
 ]

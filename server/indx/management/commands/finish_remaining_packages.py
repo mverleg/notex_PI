@@ -10,7 +10,7 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		for version in PackageVersion.objects.all():
 			if not version.is_ready:
-				print('adding {0:s} to queue'.format(version))
+				print('adding {0:s} to queue'.format(str(version)))
 				upload_postproc(version)
 		print('done!')
 

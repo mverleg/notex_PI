@@ -1,13 +1,14 @@
 
 from collections import OrderedDict
-from commentjson import load
+#from commentjson import load  #todo
+from json import load
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from os.path import exists, join, getsize
 from base.json_response import JSONResponse
 from indx.models import PackageSeries, PackageVersion
-from package_versions import str2intrest, VersionTooHigh
+from package_versions import str2nrrest, VersionTooHigh
 
 
 def package_list(request):
@@ -38,7 +39,7 @@ def version_info(request, name, v):
 	except PackageSeries.DoesNotExist:
 		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
 	try:
-		vnr, rest = str2intrest(v)
+		vnr, rest = str2nrrest(v)
 		version = PackageVersion.objects.get(package=package, version=vnr, rest=rest)
 	except PackageVersion.DoesNotExist:
 		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)
@@ -65,7 +66,7 @@ def version_download(request, name, v):
 	except PackageSeries.DoesNotExist:
 		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
 	try:
-		vnr, rest = str2intrest(v)
+		vnr, rest = str2nrrest(v)
 		version = PackageVersion.objects.get(package=package, version=vnr, rest=rest)
 	except PackageVersion.DoesNotExist:
 		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)

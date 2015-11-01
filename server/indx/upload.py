@@ -35,7 +35,7 @@ def create_zip(version_id):
 	except PackageVersion.DoesNotExist:
 		raise PackageVersion.DoesNotExist('Trying to create archive of version pk={0:d} but it was not found'.format(version_id))
 	package = version.package
-	source_dir_path = join(settings.PACKAGE_DIR, package.name, 'v{0:s}'.format(version.version_display))
+	source_dir_path = join(settings.PACKAGE_DIR, package.name, '{0:s}'.format(version.version_display))
 	goal_dir_path = join(settings.PACKAGE_ZIP_DIR, package.name)
 	tmp_path = join(goal_dir_path, 'tmp.{0:s}'.format(version.version_display))
 	file_path = join(goal_dir_path, '{0:s}.zip'.format(version.version_display))

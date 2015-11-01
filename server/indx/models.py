@@ -4,14 +4,14 @@ from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.db import models
 from os.path import join, exists
-from package_versions import intrest2str
+from package_versions import nrrest2str
 
 
 class PackageSeries(models.Model):
 	name = models.CharField(validators = [
 		RegexValidator(settings.PACKAGE_NAME_PATTERN, settings.PACKAGE_NAME_MESSAGE),
 	], max_length=64, unique=True, db_index=True)
-	owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=False, null=True)
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=False, null=True, related_name='packages')
 	license_name = models.CharField(max_length=32)
 	readme_name = models.CharField(validators=[
 		RegexValidator(r'^{0:s}$'.format(settings.FILENAME_PATTERN), settings.FILENAME_MESSAGE),
@@ -32,7 +32,7 @@ class PackageVersion(models.Model):
 	package = models.ForeignKey(PackageSeries, related_name='versions')
 	version = models.PositiveIntegerField(help_text='10000 * major + minor')
 	rest = models.CharField(validators=[
-		RegexValidator(r'^{0:s}$'.format(settings.VERSION_REST_PATTERN), settings.VERSION_NAME_MESSAGE),
+		RegexValidator(r'^{0:s}$'.format(settings.VERSION_REST_PATTERN), settings.VERSION_MESSAGE),
 	], max_length=24, blank=True)
 	when = models.DateTimeField(auto_now_add=True)
 	listed = models.BooleanField(default=True)
@@ -47,11 +47,11 @@ class PackageVersion(models.Model):
 
 	@property
 	def version_display(self):
-		return intrest2str(self.version, self.rest)
+		return nrrest2str(self.version, self.rest)
 
 	@property
 	def path(self):
-		return join(settings.PACKAGE_DIR, self.package.name, 'v{0:s}'.format(self.version_display))
+		return join(settings.PACKAGE_DIR, self.package.name, '{0:s}'.format(self.version_display))
 
 	@property
 	def zip_path(self):
