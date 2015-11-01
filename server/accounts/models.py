@@ -10,9 +10,9 @@ class IndexUser(AbstractUser):
 
 	key = models.CharField(max_length=32, validators=[
 		MinLengthValidator(32),
-	])
+	], null=False, blank=True, help_text='Used for authenticated so keep it secret! Automatically generated if emtpy.')
 
-	ALLOWED = string.printable.rstrip()
+	ALLOWED = string.printable.rstrip().replace('\'', '').replace('"', '')
 
 	def save(self, *args, **kwargs):
 		if not self.key:
