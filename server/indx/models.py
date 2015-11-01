@@ -4,12 +4,12 @@ from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.db import models
 from os.path import join, exists
-from indx.version_convs import version_intrest2str
+from package_versions import intrest2str
 
 
 class PackageSeries(models.Model):
 	name = models.CharField(validators = [
-		RegexValidator(settings.PACKAGE_NAME_PATTERN, 'Package names may contain only letters, numbers, periods and underscores and must start with a letter.'),
+		RegexValidator(settings.PACKAGE_NAME_PATTERN, settings.PACKAGE_NAME_MESSAGE),
 	], max_length=64, unique=True, db_index=True)
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=False, null=True)
 	license_name = models.CharField(max_length=32)
@@ -32,7 +32,7 @@ class PackageVersion(models.Model):
 	package = models.ForeignKey(PackageSeries, related_name='versions')
 	version = models.PositiveIntegerField(help_text='10000 * major + minor')
 	rest = models.CharField(validators=[
-		RegexValidator(r'^{0:s}$'.format(settings.VERSION_REST_PATTERN), 'Versions may contain only letters, numbers, periods, dashes and underscores.'),
+		RegexValidator(r'^{0:s}$'.format(settings.VERSION_REST_PATTERN), settings.VERSION_NAME_MESSAGE),
 	], max_length=24, blank=True)
 	when = models.DateTimeField(auto_now_add=True)
 	listed = models.BooleanField(default=True)
@@ -47,7 +47,7 @@ class PackageVersion(models.Model):
 
 	@property
 	def version_display(self):
-		return version_intrest2str(self.version, self.rest)
+		return intrest2str(self.version, self.rest)
 
 	@property
 	def path(self):

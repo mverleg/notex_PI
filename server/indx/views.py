@@ -1,13 +1,13 @@
 
 from collections import OrderedDict
-from json import load
+from commentjson import load
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from os.path import exists, join, getsize
 from base.json_response import JSONResponse
-from indx.version_convs import version_str2intrest, VersionTooHigh
 from indx.models import PackageSeries, PackageVersion
+from package_versions import str2intrest, VersionTooHigh
 
 
 def package_list(request):
@@ -38,12 +38,12 @@ def version_info(request, name, v):
 	except PackageSeries.DoesNotExist:
 		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
 	try:
-		vnr, rest = version_str2intrest(v)
+		vnr, rest = str2intrest(v)
 		version = PackageVersion.objects.get(package=package, version=vnr, rest=rest)
 	except PackageVersion.DoesNotExist:
 		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)
 	except VersionTooHigh:
-		return HttpResponse('version "{1:s}" for package "{0:s}" is too high'.format(name, v), status=400)
+		return HttpResponse('version "{1:s}" for package "{0:s}" is too high (maximum is {2:d})'.format(name, v, settings.VERSION_MAX), status=400)
 	versions = [pv.version_display for pv in package.versions.filter(listed=True)]
 	if not exists(join(version.path, 'config.json')):
 		return HttpResponse('package "{0:s}" version "{1:s}" appears to be damaged or missing'.format(name, v), status=500)
@@ -65,7 +65,7 @@ def version_download(request, name, v):
 	except PackageSeries.DoesNotExist:
 		return HttpResponse('package "{0:s}" not found'.format(name), status=404)
 	try:
-		vnr, rest = version_str2intrest(v)
+		vnr, rest = str2intrest(v)
 		version = PackageVersion.objects.get(package=package, version=vnr, rest=rest)
 	except PackageVersion.DoesNotExist:
 		return HttpResponse('version "{1:s}" for package "{0:s}" not found'.format(name, v), status=404)

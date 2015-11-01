@@ -1,5 +1,7 @@
 
 from os.path import dirname, abspath, join
+from package_versions import PACKAGE_NAME_PATTERN, PACKAGE_NAME_MESSAGE, VERSION_REST_PATTERN, \
+	VERSION_PATTERN, VERSION_MESSAGE, FILENAME_PATTERN, FILENAME_MESSAGE, VERSION_MAX
 
 
 BASE_DIR = dirname(dirname(abspath(__file__)))
@@ -9,16 +11,8 @@ AUTH_USER_MODEL = 'accounts.IndexUser'
 PACKAGE_ZIP_DIR = join(BASE_DIR, 'package_zips')
 PACKAGE_DIR = join(BASE_DIR, 'packages')
 
-PACKAGE_NAME_PATTERN = r'[a-zA-Z][a-zA-Z0-9_.]*'
-
-VERSION_REST_PATTERN = r'[^.][a-zA-Z0-9_\-.]+'
-
 SITE_URL = 'http://localhost.markv.nl:8000/'
 CDN_URL = 'http://localhost.markv.nl:8000/cdn'
-
-FILENAME_PATTERN = r'[a-zA-Z0-9_\-.]{1,32}'
-FILENAME_MESSAGE = 'File and directory names may have a length up to 32 ' + \
-	'selected from alphanumeric characters, periods, dashes and underscores.'  # the 32 is the chosen db limit
 
 SECRET_KEY = '@xe62(k2ayb7xh=ws!%h#ys%(sl^)tsk&v69q+y2@)yg6a9b9%'
 
