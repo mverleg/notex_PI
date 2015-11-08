@@ -1,6 +1,8 @@
 NoTeX Package Index
 
 
+How normally to select based on rest part? Which is latest?
+
 - I can add some automatic license detection and then allow users to sort by common restrictions (viral, commercial)
 - Make sure there's no circularity (perhaps through a generous max depth
 -packages can be uploaded with some command or can be automatically pulled from git https.

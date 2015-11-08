@@ -24,3 +24,4 @@ class IndexUser(AbstractUser):
 		return self.key
 
 
+
