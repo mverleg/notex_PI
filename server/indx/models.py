@@ -36,6 +36,9 @@ class PackageVersion(models.Model):
 	], max_length=24, blank=True)
 	when = models.DateTimeField(auto_now_add=True)
 	listed = models.BooleanField(default=True)
+	signature = models.CharField(max_length=43, help_text='b64 sha256 hash of the package')
+
+	#todo: can not be approved if the license isn't one of the approved ones
 
 	class Meta:
 		verbose_name = 'Version'
@@ -63,5 +66,12 @@ class PackageVersion(models.Model):
 
 	def get_absolute_path(self):
 		return reverse('version_info', kwargs={'name': self.name, 'v': self.version_display})
+
+
+class VersionApproval(models.Model):
+	approver = models.ForeignKey(settings.AUTH_USER_MODEL)
+	version = models.ForeignKey(PackageVersion)
+	message = models.TextField(blank=True, null=True)
+	when = models.DateTimeField(auto_now_add=True)
 
 
